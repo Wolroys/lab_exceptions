@@ -1,7 +1,5 @@
 package task1;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import task1.exception.AccountIsLockedException;
 import task1.exception.IncorrectPassword;
 import task1.interfaces.ExceptionHandler;
