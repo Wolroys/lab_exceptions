@@ -10,4 +10,5 @@ public interface TerminalServer {
     void withdraw(int amount) throws CurrencyException;
 
     int checkBalance();
+
 }

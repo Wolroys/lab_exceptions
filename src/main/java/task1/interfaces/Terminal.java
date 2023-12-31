@@ -6,8 +6,9 @@ import java.io.IOException;
 
 public interface Terminal {
 
-    void enterPin() throws IOException, AccountIsLockedException;
+    boolean enterPin() throws IOException, AccountIsLockedException;
     void checkBalance();
     void withdraw(int amount);
     void deposit(int amount);
+    void run();
 }

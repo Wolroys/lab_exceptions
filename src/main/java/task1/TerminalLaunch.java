@@ -7,13 +7,8 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class TerminalLaunch {
-    public static void main(String[] args) throws AccountIsLockedException, IOException {
+    public static void main(String[] args){
         Terminal t = new TerminalImpl(new TerminalServerImpl(), new PinValidatorImpl());
-        Scanner scanner = new Scanner(System.in);
-
-        while (!scanner.nextLine().equals("exit")){
-            t.enterPin();
-            System.out.println("Enter something: ");
-        }
+        t.run();
     }
 }

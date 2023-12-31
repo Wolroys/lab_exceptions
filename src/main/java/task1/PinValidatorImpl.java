@@ -1,16 +1,24 @@
 package task1;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import task1.exception.AccountIsLockedException;
 import task1.exception.IncorrectPassword;
 import task1.interfaces.PinValidator;
 
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class PinValidatorImpl implements PinValidator {
     private final char[] accountPin = {'1', '2', '3', '4'};
     private int countOfMistakes;
+    private LocalTime coolDown;
 
     {
         countOfMistakes = 0;
+        coolDown = LocalTime.MIN;
     }
 
 
@@ -38,4 +46,55 @@ public class PinValidatorImpl implements PinValidator {
          System.out.println("Incorrect password");
          return false;
     }
+
+    @Override
+    public boolean login() throws AccountIsLockedException {
+        if (isBanned()) {
+            throw new AccountIsLockedException((10 - coolDown.until(LocalTime.now(), ChronoUnit.SECONDS)) + " seconds left");
+        }
+        char[] pin = {'_', '_', '_', '_'};
+        int i = 0;
+        try{
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Write your pin: ");
+            while (i < 4 && countOfMistakes < 3){
+
+                System.out.println(Arrays.toString(pin));
+                String digit = scanner.nextLine();
+
+                if (!characterHandler(digit))
+                    continue;
+
+                pin[i++] = digit.charAt(0);
+
+                if (i == 4){
+                    if (!checkPassword(pin)) {
+                        i = 0;
+                        countOfMistakes++;
+                        Arrays.fill(pin, '_');
+                    }
+                }
+            }
+
+            if (countOfMistakes == 3){
+                coolDown = LocalTime.now();
+                System.out.println("You have made too many login attempts. Wait 10 seconds");
+            }
+
+            return true;
+        } catch (IncorrectPassword e) {
+            System.out.println(e.getMessage());
+        }
+
+        return false;
+    }
+
+    private boolean isBanned(){
+        if (coolDown.plusSeconds(10).isBefore(LocalTime.now())){
+            countOfMistakes = 0;
+            return false;
+        };
+        return true;
+    }
+
 }
