@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import task1.exception.AccountIsLockedException;
 import task1.exception.IncorrectPassword;
+import task1.interfaces.ExceptionHandler;
 import task1.interfaces.PinValidator;
 
 import java.time.LocalTime;
@@ -15,6 +16,7 @@ public class PinValidatorImpl implements PinValidator {
     private final char[] accountPin = {'1', '2', '3', '4'};
     private int countOfMistakes;
     private LocalTime coolDown;
+    private final ExceptionHandler handler = new ConsoleExceptionHandler();
 
     {
         countOfMistakes = 0;
@@ -27,12 +29,12 @@ public class PinValidatorImpl implements PinValidator {
         try {
             int digit = Integer.parseInt(symbol);
             if (digit < 0 || digit >= 10){
-                System.out.println("You should write a digit between 0 and 9");
+                handler.showException("You should write a digit between 0 and 9");
                 return false;
             }
             return true;
         } catch (NumberFormatException e) {
-            System.out.println("You should write a DIGIT between 0 and 9");
+            handler.showException("You should write a DIGIT between 0 and 9");
             return false;
         }
     }
@@ -43,14 +45,14 @@ public class PinValidatorImpl implements PinValidator {
              System.out.println("successful login");
              return true;
          }
-         System.out.println("Incorrect password");
-         return false;
+         throw new IncorrectPassword("Incorrect password");
     }
 
     @Override
     public boolean login() throws AccountIsLockedException {
         if (isBanned()) {
-            throw new AccountIsLockedException((10 - coolDown.until(LocalTime.now(), ChronoUnit.SECONDS)) + " seconds left");
+            throw new AccountIsLockedException((10 - coolDown.until(LocalTime.now(),
+                    ChronoUnit.SECONDS)) + " seconds left");
         }
         char[] pin = {'_', '_', '_', '_'};
         int i = 0;
@@ -83,7 +85,7 @@ public class PinValidatorImpl implements PinValidator {
 
             return true;
         } catch (IncorrectPassword e) {
-            System.out.println(e.getMessage());
+            handler.showException(e.getMessage());
         }
 
         return false;

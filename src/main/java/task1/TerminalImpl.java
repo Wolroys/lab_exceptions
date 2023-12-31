@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import task1.exception.AccountIsLockedException;
 import task1.exception.CurrencyException;
 import task1.exception.CurrencyIssuanceException;
+import task1.interfaces.ExceptionHandler;
 import task1.interfaces.PinValidator;
 import task1.interfaces.Terminal;
 import task1.interfaces.TerminalServer;
@@ -16,6 +17,8 @@ public class TerminalImpl implements Terminal {
     private final TerminalServer server;
     private final PinValidator pinValidator;
 
+    private final ExceptionHandler handler = new ConsoleExceptionHandler();
+
     public TerminalImpl(TerminalServerImpl server, PinValidatorImpl pinValidator) {
         this.server = server;
         this.pinValidator = pinValidator;
@@ -26,7 +29,7 @@ public class TerminalImpl implements Terminal {
         try {
             return pinValidator.login();
         } catch (AccountIsLockedException e) {
-            System.out.println(e.getMessage());
+            handler.showException(e.getMessage());
             return false;
         }
     }
@@ -42,7 +45,7 @@ public class TerminalImpl implements Terminal {
             server.withdraw(amount);
             System.out.println("Successful operation");
         } catch (CurrencyException e) {
-            System.out.println(e.getMessage());
+            handler.showException(e.getMessage());
         }
     }
 
@@ -52,7 +55,7 @@ public class TerminalImpl implements Terminal {
             server.deposit(amount);
             System.out.println("Successful operation");
         } catch (CurrencyIssuanceException e) {
-            System.out.println(e.getMessage());
+            handler.showException(e.getMessage());
         }
     }
 
@@ -78,7 +81,7 @@ public class TerminalImpl implements Terminal {
                         amount = Integer.parseInt(scanner.nextLine());
                         deposit(amount);
                     } catch (NumberFormatException e) {
-                        System.out.println("You should write a number");
+                        handler.showException("You should write a number");
                     }
                 }
                 case "2" -> {
@@ -87,7 +90,7 @@ public class TerminalImpl implements Terminal {
                         amount = Integer.parseInt(scanner.nextLine());
                         withdraw(amount);
                     } catch (NumberFormatException e) {
-                        System.out.println("You should write a number");
+                        handler.showException("You should write a number");
                     }
                 }
                 case "3" -> checkBalance();
