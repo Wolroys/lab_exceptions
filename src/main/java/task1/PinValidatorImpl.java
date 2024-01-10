@@ -2,7 +2,7 @@ package task1;
 
 import task1.exception.AccountIsLockedException;
 import task1.exception.IncorrectPassword;
-import task1.interfaces.ExceptionHandler;
+import task1.interfaces.MessageHandler;
 import task1.interfaces.PinValidator;
 
 import java.time.LocalTime;
@@ -14,7 +14,7 @@ public class PinValidatorImpl implements PinValidator {
     private final char[] accountPin = {'1', '2', '3', '4'};
     private int countOfMistakes;
     private LocalTime coolDown;
-    private final ExceptionHandler handler = new ConsoleExceptionHandler();
+    private final MessageHandler handler = new ConsoleHandler();
 
     {
         countOfMistakes = 0;
@@ -27,12 +27,12 @@ public class PinValidatorImpl implements PinValidator {
         try {
             int digit = Integer.parseInt(symbol);
             if (digit < 0 || digit >= 10){
-                handler.showException("You should write a digit between 0 and 9");
+                handler.show("You should write a digit between 0 and 9");
                 return false;
             }
             return true;
         } catch (NumberFormatException e) {
-            handler.showException("You should write a DIGIT between 0 and 9");
+            handler.show("You should write a DIGIT between 0 and 9");
             return false;
         }
     }
@@ -83,7 +83,7 @@ public class PinValidatorImpl implements PinValidator {
 
             return true;
         } catch (IncorrectPassword e) {
-            handler.showException(e.getMessage());
+            handler.show(e.getMessage());
         }
 
         return false;

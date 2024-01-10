@@ -4,7 +4,7 @@ package task1;
 import task1.exception.AccountIsLockedException;
 import task1.exception.CurrencyException;
 import task1.exception.CurrencyIssuanceException;
-import task1.interfaces.ExceptionHandler;
+import task1.interfaces.MessageHandler;
 import task1.interfaces.PinValidator;
 import task1.interfaces.Terminal;
 import task1.interfaces.TerminalServer;
@@ -16,7 +16,7 @@ public class TerminalImpl implements Terminal {
     private final TerminalServer server;
     private final PinValidator pinValidator;
 
-    private final ExceptionHandler handler = new ConsoleExceptionHandler();
+    private final MessageHandler handler = new ConsoleHandler();
 
     public TerminalImpl(TerminalServerImpl server, PinValidatorImpl pinValidator) {
         this.server = server;
@@ -28,23 +28,23 @@ public class TerminalImpl implements Terminal {
         try {
             return pinValidator.login();
         } catch (AccountIsLockedException e) {
-            handler.showException(e.getMessage());
+            handler.show(e.getMessage());
             return false;
         }
     }
 
     @Override
     public void checkBalance() {
-        System.out.println("Your balance is - " + server.checkBalance() + "$");
+        handler.show("Your balance is - " + server.checkBalance() + "$");
     }
 
     @Override
     public void withdraw(int amount) {
         try {
             server.withdraw(amount);
-            System.out.println("Successful operation");
+            handler.show("Successful operation");
         } catch (CurrencyException e) {
-            handler.showException(e.getMessage());
+            handler.show(e.getMessage());
         }
     }
 
@@ -52,19 +52,19 @@ public class TerminalImpl implements Terminal {
     public void deposit(int amount) {
         try {
             server.deposit(amount);
-            System.out.println("Successful operation");
+            handler.show("Successful operation");
         } catch (CurrencyIssuanceException e) {
-            handler.showException(e.getMessage());
+            handler.show(e.getMessage());
         }
     }
 
     @Override
     public void run() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Hello, do you want to use terminal (Y/N)?");
+        handler.show("Hello, do you want to use terminal (Y/N)?");
 
         while (!scanner.nextLine().equals("N") && !enterPin()){
-            System.out.println("Do you want to continue? (Y/N)");
+            handler.show("Do you want to continue? (Y/N)");
         }
 
         printUserInterface();
@@ -80,7 +80,7 @@ public class TerminalImpl implements Terminal {
                         amount = Integer.parseInt(scanner.nextLine());
                         deposit(amount);
                     } catch (NumberFormatException e) {
-                        handler.showException("You should write a number");
+                        handler.show("You should write a number");
                     }
                 }
                 case "2" -> {
@@ -89,20 +89,20 @@ public class TerminalImpl implements Terminal {
                         amount = Integer.parseInt(scanner.nextLine());
                         withdraw(amount);
                     } catch (NumberFormatException e) {
-                        handler.showException("You should write a number");
+                        handler.show("You should write a number");
                     }
                 }
                 case "3" -> checkBalance();
                 case "4" -> printUserInterface();
-                default -> System.out.println("Unknown command");
+                default -> handler.show("Unknown command");
             }
         }
 
-        System.out.println("Have a good day!");
+        handler.show("Have a good day!");
     }
 
     private void printUserInterface(){
-        System.out.println("""
+        handler.show("""
                 What kind of operation do you want to perform?
                 deposit money - 1
                 withdraw money - 2
